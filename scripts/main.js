@@ -1,3 +1,5 @@
+import State from "./state.js";
 import QuizApp from "./quiz.js";
 
-new QuizApp();
+export const state = new State();
+new QuizApp(state);
