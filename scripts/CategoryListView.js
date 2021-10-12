@@ -16,7 +16,7 @@ class CategoryListView {
                         <img src="${src}" class="card-img-top" alt="${category}" height="250"/>
                         <div class="card-body">
                         <h5 class="card-title">${category}</h5>
-                        <button href="#" class="btn btn-primary w-100" data-id="${category}">
+                        <button class="btn btn-primary w-100" data-id="${category}">
                             <span>Select ${category}</span>
                         </button>
                         </div>

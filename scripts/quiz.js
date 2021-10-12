@@ -24,6 +24,15 @@ class QuizApp {
     constructor(state) {
         this.QUIZ_STATE = state;
         // получаем список категорий с путями к картинкам
+        this.renderCategoriesList();
+
+        this.fetchQuestions()
+            .then(data => {
+                console.log(data);
+            }).catch(console.log)
+    }
+
+    renderCategoriesList() {
         this.fetchImages()
             .then(new CategoryListView().renderCategories.bind(this))
             .then(btnList => {
@@ -33,19 +42,18 @@ class QuizApp {
                 })
             })
             .catch(console.log)
-
-        this.fetchQuestions()
-            .then(data => {
-                console.log(data);
-            }).catch(console.log)
     }
 
     async fetchImages() {
         try {
-            const responce = await fetch(`${JSON_ROOT}/images.json`);
-            const data = await responce.json();
-            this.CACHED_IMAGES = data;
-            return data;
+            if (!this.CACHED_IMAGES.length) {
+                const responce = await fetch(`${JSON_ROOT}/images.json`);
+                const data = await responce.json();
+                this.CACHED_IMAGES = data;
+                return data;
+            } else {
+                return this.CACHED_IMAGES;
+            }
         } catch (err) {
             console.error(err.message);
         }
@@ -107,6 +115,8 @@ class QuizApp {
         this.QUIZ_STATE.questions = [...this.QUIZ_MAP.get(this.QUIZ_STATE.category)].filter(_q => _q.difficulty === difficulty)
         const src = this.CACHED_IMAGES.find(c => c.category === this.QUIZ_STATE.category).src
         new QuizStartCard(src, this.QUIZ_STATE.category, difficulty);
+        const backBtn = document.querySelector('[data-id="back"]');
+        backBtn.addEventListener('click', this.renderCategoriesList.bind(this));
     }
 
     handleCategoriesBtnClick(category) {
@@ -123,6 +133,10 @@ class QuizApp {
                     console.error(err.message);
                 }
             })
+    }
+
+    handlerBackButtonClick() {
+
     }
 }
 

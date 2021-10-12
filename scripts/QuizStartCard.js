@@ -19,6 +19,9 @@ class QuizStartCard {
                         <h5 class="card-title">${category}</h5>
                         <button class="btn btn-primary w-100" data-id="${category}">Go</button>
                     </div>
+                    <div class="col-6 mx-auto mt-2">
+                        <button class="btn btn-outline-primary w-100" data-id="back">Return to category selection</button>
+                    </div>
                 </div>
             </div>
         </div>
