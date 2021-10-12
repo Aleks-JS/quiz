@@ -5,9 +5,9 @@ import CategoryListView from "./CategoryListView.js";
 import {
     API_KEY,
     JSON_ROOT,
-    QUIZ_API_URL,
-    ROOT_DOM
+    QUIZ_API_URL
 } from "./variables.js";
+import QuizStartCard from "./QuizStartCard.js";
 
 class QuizApp {
 
@@ -26,6 +26,7 @@ class QuizApp {
         // получаем список категорий с путями к картинкам
         this.fetchImages()
             .then(new CategoryListView().renderCategories.bind(this))
+            .then(selectedCategory => this.handleCategoriesBtnClick(selectedCategory))
             .catch(console.log)
 
         this.fetchQuestions()
@@ -100,29 +101,7 @@ class QuizApp {
     renderDifficultis(difficulty) {
         this.QUIZ_STATE.questions = [...this.QUIZ_MAP.get(this.QUIZ_STATE.category)].filter(_q => _q.difficulty === difficulty)
         const src = this.CACHED_IMAGES.find(c => c.category === this.QUIZ_STATE.category).src
-        let resultHtml = `
-        <div class="col-12">
-            <div class="card">
-                <div>
-                    <img src="${src}" class="mx-auto d-block" alt="${this.QUIZ_STATE.category}" height="250"/>
-                </div>
-                <div class="card-body">
-                    <div class="col-6 mx-auto">
-                        <h5 class="card-title">${this.QUIZ_STATE.category}</h5>
-                        <button class="btn btn-primary w-100" data-id="${this.QUIZ_STATE.category}">Go</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        `;
-        ROOT_DOM.innerHTML = `
-        <div class="container">
-        <h3 class="mt-4 mb-4">You selected ${difficulty} difficulty in the ${this.QUIZ_STATE.category} category</h3>
-          <div class="row">
-            ${resultHtml}
-          </div>
-        </div>
-        `
+        new QuizStartCard(src, this.QUIZ_STATE.category, difficulty);
     }
 
     handleCategoriesBtnClick(category) {
@@ -131,6 +110,7 @@ class QuizApp {
                 data => {
                     if (data) {
                         this.QUIZ_STATE.difficulty = data;
+                        this.QUIZ_STATE.questions = this.QUIZ_MAP.get(category);
                         this.renderDifficultis(data);
                     }
                 }).catch(err => {
