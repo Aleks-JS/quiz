@@ -33,11 +33,7 @@ class CategoryListView {
             </div>
             `
             const btnList = document.querySelectorAll('.btn');
-            btnList.forEach(btn => {
-                const category = btn.getAttribute('data-id')
-                btn.addEventListener('click', () => resolve(category))
-            })
-
+            resolve(btnList)
         })
     }
 }

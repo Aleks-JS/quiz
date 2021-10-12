@@ -26,7 +26,12 @@ class QuizApp {
         // получаем список категорий с путями к картинкам
         this.fetchImages()
             .then(new CategoryListView().renderCategories.bind(this))
-            .then(selectedCategory => this.handleCategoriesBtnClick(selectedCategory))
+            .then(btnList => {
+                btnList.forEach(btn => {
+                    const category = btn.getAttribute('data-id')
+                    btn.addEventListener('click', () => this.handleCategoriesBtnClick(category))
+                })
+            })
             .catch(console.log)
 
         this.fetchQuestions()
