@@ -1,5 +1,6 @@
 import QuestionsResponce from "./questionsResponce.js";
 import ModalSetDifficulty from "./modalSetDifficulty.js";
+import ButtonSpinner from "./ButtonSpinner.js";
 
 class QuizApp {
 
@@ -52,6 +53,7 @@ class QuizApp {
     }
 
     async fetchQuizById(category) {
+        new ButtonSpinner(`[data-id=${category}] span`).add();
         try {
             this.QUIZ_STATE.category = category;
             const {
@@ -59,6 +61,7 @@ class QuizApp {
                 QUIZ_API_URL
             } = this;
             if (QUIZ_MAP.has(category)) {
+                new ButtonSpinner(`[data-id=${this.QUIZ_STATE.category}] span`).remove();
                 this.DIFFICULTY_LIST = [...QUIZ_MAP.get(category)].filter((q, i, arr) => {
                     return i === arr.findIndex(_q => _q.difficulty === q.difficulty)
                 }).map(_q => _q.difficulty)
@@ -78,6 +81,7 @@ class QuizApp {
                         })
                 }
                 const responce = await fetch(`${QUIZ_API_URL}/questions?${params}`, this.request_options)
+                    .finally(() => new ButtonSpinner(`[data-id=${this.QUIZ_STATE.category}] span`).remove())
                 const data = await responce.json()
                 this.DIFFICULTY_LIST = data.filter((q, i, arr) => {
                     return i === arr.findIndex(_q => _q.difficulty === q.difficulty)
@@ -96,12 +100,16 @@ class QuizApp {
         const src = this.CACHED_IMAGES.find(c => c.category === this.QUIZ_STATE.category).src
         let resultHtml = `
         <div class="col-12">
-            <div class="card" style="width: 18rem">
-            <img src="${src}" class="card-img-top" alt="${this.QUIZ_STATE.category}" height="250"/>
-            <div class="card-body">
-                <h5 class="card-title">${this.QUIZ_STATE.category}</h5>
-                <button href="#" class="btn btn-primary w-100" data-id="${this.QUIZ_STATE.category}">Go</button>
-            </div>
+            <div class="card">
+                <div>
+                    <img src="${src}" class="mx-auto d-block" alt="${this.QUIZ_STATE.category}" height="250"/>
+                </div>
+                <div class="card-body">
+                    <div class="col-6 mx-auto">
+                        <h5 class="card-title">${this.QUIZ_STATE.category}</h5>
+                        <button class="btn btn-primary w-100" data-id="${this.QUIZ_STATE.category}">Go</button>
+                    </div>
+                </div>
             </div>
         </div>
         `;
@@ -127,7 +135,9 @@ class QuizApp {
                     <img src="${src}" class="card-img-top" alt="${category}" height="250"/>
                     <div class="card-body">
                       <h5 class="card-title">${category}</h5>
-                      <button href="#" class="btn btn-primary w-100" data-id="${category}">Go</button>
+                      <button href="#" class="btn btn-primary w-100" data-id="${category}">
+                        <span>Select ${category}</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -152,9 +162,8 @@ class QuizApp {
         })
     }
 
-    handleCategoriesBtnClick(categoryId) {
-        this.QUIZ_STATE.categoryId = categoryId;
-        this.fetchQuizById(categoryId)
+    handleCategoriesBtnClick(category) {
+        this.fetchQuizById(category)
             .then(
                 data => {
                     if (data) {
