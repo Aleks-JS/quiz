@@ -2,18 +2,20 @@ import QuestionsResponce from "./questionsResponce.js";
 import ModalSetDifficulty from "./modalSetDifficulty.js";
 import ButtonSpinner from "./ButtonSpinner.js";
 import CategoryListView from "./CategoryListView.js";
+import {
+    API_KEY,
+    JSON_ROOT,
+    QUIZ_API_URL,
+    ROOT_DOM
+} from "./variables.js";
 
 class QuizApp {
 
-    API_KEY = 'ajsXJPL5M618y9wJ4dYFaa90yh40ikLIt7MHd0ak'
     request_options = {
         headers: {
-            'x-api-key': this.API_KEY
+            'x-api-key': API_KEY
         }
     }
-    JSON_ROOT = './json'
-    ROOT_DOM = document.querySelector('#app');
-    QUIZ_API_URL = 'https://quizapi.io/api/v1';
     QUIZ_MAP = new Map();
     QUIZ_STATE;
     DIFFICULTY_LIST = [];
@@ -34,22 +36,22 @@ class QuizApp {
 
     async fetchImages() {
         try {
-            const responce = await fetch(`${this.JSON_ROOT}/images.json`);
+            const responce = await fetch(`${JSON_ROOT}/images.json`);
             const data = await responce.json();
             this.CACHED_IMAGES = data;
             return data;
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
         }
     }
 
     async fetchQuestions() {
         try {
-            const responce = await fetch(`${this.QUIZ_API_URL}/questions`, this.request_options)
+            const responce = await fetch(`${QUIZ_API_URL}/questions`, this.request_options)
             const data = await responce.json();
             return new QuestionsResponce(data);
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
         }
     }
 
@@ -58,8 +60,7 @@ class QuizApp {
         try {
             this.QUIZ_STATE.category = category;
             const {
-                QUIZ_MAP,
-                QUIZ_API_URL
+                QUIZ_MAP
             } = this;
             if (QUIZ_MAP.has(category)) {
                 new ButtonSpinner(`[data-id=${this.QUIZ_STATE.category}] span`).remove();
@@ -92,7 +93,7 @@ class QuizApp {
             }
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
         }
     }
 
@@ -114,7 +115,7 @@ class QuizApp {
             </div>
         </div>
         `;
-        this.ROOT_DOM.innerHTML = `
+        ROOT_DOM.innerHTML = `
         <div class="container">
         <h3 class="mt-4 mb-4">You selected ${difficulty} difficulty in the ${this.QUIZ_STATE.category} category</h3>
           <div class="row">
@@ -134,7 +135,7 @@ class QuizApp {
                     }
                 }).catch(err => {
                 if (err) {
-                    console.log(err.message);
+                    console.error(err.message);
                 }
             })
     }

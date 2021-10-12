@@ -1,3 +1,7 @@
+import {
+    ROOT_DOM
+} from "./variables.js";
+
 class CategoryListView {
     renderCategories(data) {
         let resultHtml = '';
@@ -19,7 +23,7 @@ class CategoryListView {
                 </div>
             `
         });
-        this.ROOT_DOM.innerHTML = `
+        ROOT_DOM.innerHTML = `
         <div class="container">
         <h3 class="mt-4 mb-4">Please, choose category</h3>
           <div class="row">
