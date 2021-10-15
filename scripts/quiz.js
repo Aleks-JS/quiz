@@ -9,6 +9,7 @@ import {
 } from "./variables.js";
 import QuizStartCard from "./QuizStartCard.js";
 import QuizStepCard from "./QuizStepCard.js";
+import QuizFinalCard from "./QuizFinalCard.js";
 
 class QuizApp {
 
@@ -26,11 +27,6 @@ class QuizApp {
         this.QUIZ_STATE = state;
         // получаем список категорий с путями к картинкам
         this.renderCategoriesList();
-
-        // this.fetchQuestions()
-        //     .then(data => {
-        //         console.log(data);
-        //     }).catch(console.log)
     }
 
     renderCategoriesList() {
@@ -119,7 +115,7 @@ class QuizApp {
                     if (data) {
                         this.QUIZ_STATE.difficulty = data;
                         this.QUIZ_STATE.questions = this.QUIZ_MAP.get(category);
-                        this.renderDifficultis(data);
+                        this.renderQuiz(data);
                     }
                 }).catch(err => {
                 if (err) {
@@ -128,7 +124,7 @@ class QuizApp {
             })
     }
 
-    renderDifficultis(difficulty) {
+    async renderQuiz(difficulty) {
         this.QUIZ_STATE.questions = [...this.QUIZ_MAP.get(this.QUIZ_STATE.category)].filter(_q => _q.difficulty === difficulty)
         const src = this.CACHED_IMAGES.find(c => c.category === this.QUIZ_STATE.category).src
         new QuizStartCard().render(src, this.QUIZ_STATE.category, difficulty)
@@ -136,9 +132,15 @@ class QuizApp {
                 if (data === 'back') {
                     this.renderCategoriesList()
                 } else {
-                    new QuizStepCard(this.QUIZ_STATE)
+                    return new QuizStepCard(this.QUIZ_STATE).renderCard()
                 }
-            });
+            })
+            .then(data => {
+                return new QuizFinalCard().render();
+            })
+            .then(data => {
+                console.log(data);
+            }).catch(error => console.warn(error.message))
     }
 }
 
