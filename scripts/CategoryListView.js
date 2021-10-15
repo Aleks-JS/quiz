@@ -1,5 +1,5 @@
 import {
-    ROOT_DOM
+    APP
 } from "./variables.js";
 
 class CategoryListView {
@@ -24,7 +24,7 @@ class CategoryListView {
                     </div>
                 `
             });
-            ROOT_DOM.innerHTML = `
+            APP.innerHTML = `
             <div class="container">
             <h3 class="mt-4 mb-4">Please, choose category</h3>
             <div class="row">
