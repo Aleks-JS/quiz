@@ -1,0 +1,7 @@
+.correct span{
+    color: rgb(28, 211, 89) !important;
+}
+
+.not-correct span{
+    color: rgb(255, 68, 68) !important;
+}

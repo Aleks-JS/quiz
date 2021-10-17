@@ -47,7 +47,7 @@ class QuizFinalCard {
         const card = document.createElement('div');
         card.classList.add('card', 'mb-1');
         const cardHeader = document.createElement('div');
-        cardHeader.classList.add('card-header');
+        cardHeader.classList.add('card-header', 'lead');
         cardHeader.textContent = question;
         card.append(cardHeader);
         const ul = document.createElement('ul');
@@ -60,7 +60,10 @@ class QuizFinalCard {
 
     addLiElement(target, value, isCorrect) {
         const li = document.createElement('li');
-        li.classList.add('list-group-item', isCorrect ? 'correct' : 'not-correct');
+        li.classList.add('list-group-item');
+        if (target === 'Your answer') {
+            li.classList.add(isCorrect ? 'correct' : 'not-correct');
+        }
         const s = document.createElement('strong');
         s.textContent = `${target}: `
         li.append(s);
@@ -75,6 +78,8 @@ class QuizFinalCard {
         const correctAnswersCount = Object.values(state.answers).filter(answer => answer.isCorrect).length;
         return new Promise((resolve, reject) => {
             const resultHtml = `
+            <div class="container">
+                <h3 class="mt-4 mb-4 display-3">Quiz</h3>
                 <div class="card final-card text-center">
                     <div class="card-header">Congratulations! The quiz is over!</div>
                     <div class="card-body">
@@ -85,6 +90,7 @@ class QuizFinalCard {
                     2 дня спустя
                     </div>
                 </div>
+            </div>
         `
             APP.innerHTML = resultHtml;
            

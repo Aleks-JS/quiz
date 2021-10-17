@@ -48,13 +48,16 @@ class QuizStepCard {
                 const q = STATE.questions[STATE.currentStep - 1];
                 const isMmultiple = q.multiple_correct_answers === 'true';
                 let resultHtml = `
-                <div class="card">
-                    <h5 class="card-header"></h5>
-                    <form class="card-body">
-                        <h5 class="card-title">Особое обращение с заголовком</h5>
-                        <p class="card-text">С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
+                <div class="container">
+                <h3 class="mt-4 mb-4 display-3">Quiz</h3>
+                    <div class="card">
+                        <h5 class="card-header"></h5>
+                        <form class="card-body">
+                            <h5 class="card-title">Особое обращение с заголовком</h5>
+                            <p class="card-text">С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
+                            <button type="submit" class="btn btn-primary mt-3">Next</button>
+                        </form>
+                    </div>
                 </div>
                 `
                 APP.innerHTML = resultHtml;
