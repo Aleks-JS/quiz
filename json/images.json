@@ -1,13 +1,13 @@
 [{
         "category": "Linux",
-        "src": "/images/linux.png"
+        "src": "./images/linux.png"
     },
     {
         "category": "Docker",
-        "src": "/images/docker.png"
+        "src": "./images/docker.png"
     },
     {
         "category": "javaScript",
-        "src": "/images/js.png"
+        "src": "./images/js.png"
     }
 ]
