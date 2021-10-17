@@ -115,7 +115,7 @@ class QuizApp {
                     if (data) {
                         this.QUIZ_STATE.difficulty = data;
                         this.QUIZ_STATE.questions = this.QUIZ_MAP.get(category);
-                        this.renderQuiz(data);
+                        return this.renderQuiz(data);
                     }
                 }).catch(err => {
                 if (err) {
@@ -127,6 +127,15 @@ class QuizApp {
     async renderQuiz(difficulty) {
         this.QUIZ_STATE.questions = [...this.QUIZ_MAP.get(this.QUIZ_STATE.category)].filter(_q => _q.difficulty === difficulty)
         const src = this.CACHED_IMAGES.find(c => c.category === this.QUIZ_STATE.category).src
+        // const renderStart = await new QuizStartCard().render(src, this.QUIZ_STATE.category, difficulty);
+        // const nextStepData = renderStart === 'back' ?
+        //     this.renderCategoriesList() :
+        //     await new QuizStepCard(this.QUIZ_STATE).renderCard();
+        // if (nextStepData) {
+        //     return new QuizFinalCard().render(nextStepData);
+        // }
+        // return nextStepData;
+
         new QuizStartCard().render(src, this.QUIZ_STATE.category, difficulty)
             .then(data => {
                 if (data === 'back') {
@@ -135,10 +144,14 @@ class QuizApp {
                     return new QuizStepCard(this.QUIZ_STATE).renderCard()
                 }
             })
-            .then(data => {
-                return new QuizFinalCard().render();
+            .then(state => {
+                return new QuizFinalCard().render(state);
             })
             .then(data => {
+                if (data) {
+                    this.QUIZ_STATE.init();
+                    this.renderCategoriesList()
+                }
                 console.log(data);
             }).catch(error => console.warn(error.message))
     }

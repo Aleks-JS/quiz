@@ -3,10 +3,6 @@ import {
 } from "./variables.js";
 
 class QuizStartCard {
-    // constructor(src, category, difficulty) {
-    //     this.create(src, category, difficulty)
-    // }
-
     render(src, category, difficulty) {
         return new Promise((resolve) => {
             let resultHtml = `

@@ -1,6 +1,8 @@
 class Answer {
     correctAnswer;
+    correctAnswerValue;
     receivedAnswer;
+    receivedAnswerValue;
     isCorrect;
     id;
     constructor(question, answer) {
@@ -8,10 +10,17 @@ class Answer {
     }
 
     prepareAnswer(question, answer) {
-        this.correctAnswer = Object.keys(question.correct_answers).find(
+        const correctAnswers = [];        
+        this.correctAnswer = Object.keys(question.correct_answers).filter(
             answer => question.correct_answers[answer] === 'true'
-        ).replace('_correct', '')
+        ).map(value => {
+            const result = value.replace('_correct', '');
+            correctAnswers.push(question.answers[result]);
+            return result
+        }).join();        
+        this.correctAnswerValue = correctAnswers.join();
         this.receivedAnswer = answer;
+        this.receivedAnswerValue = answer.split(',').map(a => question.answers[a]).join();
         this.isCorrect = this.correctAnswer === this.receivedAnswer;
         this.id = question.id
     }

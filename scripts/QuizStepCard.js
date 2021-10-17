@@ -12,6 +12,32 @@ class QuizStepCard {
         this.renderCard();
     }
 
+    addAnswerItem(type, key, value) {
+        const label = document.createElement('label');
+        label.classList.add('list-group-item');
+        const answer = document.createElement('input');
+        answer.type = type;
+        answer.name = 'answer';
+        answer.classList.add('form-check-input', 'me-1');
+        answer.value = key;
+        answer.id = key;
+        if (type === 'radio') {
+            answer.required = true
+        }
+        label.textContent = value;
+        label.prepend(answer);
+        return label;
+    }
+
+    setRequired(form) {
+        const someChecked = !![...form.answer].some(input => input.checked);
+        !![...form.answer].filter(input => input.type !== 'radio').forEach(input => {
+            const required = someChecked ? '' : 'You must select at least one value'
+            input.setCustomValidity(required)
+        })
+
+    }
+
     renderCard() {
         return new Promise((resolve, reject) => {
             const nextStep = () => {
@@ -20,57 +46,50 @@ class QuizStepCard {
                 } = this;
                 STATE.currentStep += 1;
                 const q = STATE.questions[STATE.currentStep - 1];
+                const isMmultiple = q.multiple_correct_answers === 'true';
                 let resultHtml = `
                 <div class="card">
-                    <h5 class="card-header">${q.question}</h5>
+                    <h5 class="card-header"></h5>
                     <form class="card-body">
                         <h5 class="card-title">Особое обращение с заголовком</h5>
                         <p class="card-text">С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
-                        <div class="answers"></div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
                 </div>
                 `
                 APP.innerHTML = resultHtml;
-                let answersHtml = '';
+                document.querySelector('.card-header').textContent = q.question;
+                const answers = document.createElement('ul');
+                answers.classList.add('answers', 'list-group');
                 Object.keys(q.answers).forEach(key => {
                     if (!q.answers[key]) {
                         return;
                     }
-                    if (q.multiple_correct_answers === 'true') {
-                        answersHtml += `
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="${key}" id="${key}">
-                    <label class="form-check-label" for="${key}">
-                        ${q.answers[key]}
-                    </label>
-                </div>
-                `
+                    if (isMmultiple) {
+                        answers.append(this.addAnswerItem('checkbox', key, q.answers[key]));
                     } else {
-                        answersHtml += `
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="answer" value="${key}" id="${key}">
-                    <label class="form-check-label" for="${key}">
-                    ${q.answers[key]}
-                    </label>
-                </div>
-                `
+                        answers.append(this.addAnswerItem('radio', key, q.answers[key]));
                     }
                 })
-
-                document.querySelector('.answers').innerHTML = answersHtml;
-                document.querySelector('form').addEventListener('submit', submitHandler);
+                const form = document.querySelector('form');
+                /** insert before button */
+                document.querySelector('button[type="submit"]').before(answers)
+                this.setRequired(form);
+                form.addEventListener('change', this.setRequired.bind(this, form))
+                form.addEventListener('submit', submitHandler);
 
                 function submitHandler(event) {
                     event.preventDefault();
-                    const answer = event.target.elements.answer.value;
-
-                    document.querySelector('form').removeEventListener('submit', submitHandler)
-
+                    const answer = !isMmultiple 
+                        ? event.target.elements.answer.value 
+                        : [...event.target.elements.answer].filter(input => input.checked).map(input => input.value).join();
+                    form.removeEventListener('submit', submitHandler);
+                    form.removeEventListener('change', this.setRequired);
                     if (STATE.questions.length === STATE.currentStep) {
-                        resolve('comleted')
+                        STATE.answers[STATE.currentStep] = new Answer(STATE.questions[STATE.currentStep - 1], answer);
+                        resolve(STATE)
                     } else {
-                        STATE.answers[STATE.currentStep] = new Answer(STATE.questions[STATE.currentStep], answer);
+                        STATE.answers[STATE.currentStep] = new Answer(STATE.questions[STATE.currentStep - 1], answer);
                         nextStep()
                     }
                 }
