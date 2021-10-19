@@ -37,6 +37,7 @@ class QuizStepCard {
 			STATE
 		} = this;
 		const q = STATE.questions[STATE.currentStep - 1];
+		const isMultiple = q.multiple_correct_answers === 'true';
 		APP.innerHTML = `
                 <div class="container">
                 <h3 class="mt-4 mb-4 display-3">Quiz</h3>
@@ -52,47 +53,64 @@ class QuizStepCard {
                 `;
 		document.querySelector('.card-header').textContent = `Question ${STATE.currentStep} of ${STATE.questions.length}`;
 		document.querySelector('.card-title').textContent = q.question;
-		document.querySelector('.card-text').textContent = q.multiple_correct_answers ? 'Choose one or more answer options' : 'Choose one answer';
+		document.querySelector('.card-text').textContent = isMultiple ? 'Choose one or more answer options' : 'Choose one answer';
 		const answers = document.createElement('ul');
 		answers.classList.add('answers', 'list-group');
 		Object.keys(q.answers).forEach(key => {
 			if (!q.answers[key]) {
 				return;
 			}
-			if (q.multiple_correct_answers) {
+			if (isMultiple) {
 				answers.append(this.addAnswerItem('checkbox', key, q.answers[key]));
 			} else {
 				answers.append(this.addAnswerItem('radio', key, q.answers[key]));
 			}
-		})
+		});
 		/** insert before button */
-		document.querySelector('button[type="submit"]').before(answers)
+		document.querySelector('button[type="submit"]').before(answers);
+		if (STATE.currentStep > 1) {
+			console.log(STATE.currentStep)
+			const prevStepBtn = document.createElement('button');
+			prevStepBtn.type = 'button';
+			prevStepBtn.classList.add('btn', 'btn-secondary', 'mt-3', 'me-3');
+			prevStepBtn.textContent = 'Previous';
+			document.querySelector('button[type="submit"]').before(prevStepBtn);
+		}
 	}
 
 	async renderCard() {
 		return new Promise((resolve, reject) => {
-			const prevStep = () => {
+			const nextStep = async (next = true) => {
 				const {
 					STATE
 				} = this;
-				STATE.currentStep -= 1;
-				const q = STATE.questions[STATE.currentStep - 1];
-				const isMultiple = q.multiple_correct_answers === 'true';
-				this.renderTemplate();
-
-			}
-			const nextStep = async () => {
-				const {
-					STATE
-				} = this;
-				STATE.currentStep += 1;
+				console.log(STATE)
+				STATE.currentStep = next ? STATE.currentStep += 1 : STATE.currentStep -= 1;
 				const q = STATE.questions[STATE.currentStep - 1];
 				const isMultiple = q.multiple_correct_answers === 'true';
 				await this.renderTemplate();
 				const form = document.querySelector('form');
+				console.log(form.elements.answer.value)
+				if (STATE.answers[STATE.currentStep] && STATE.answers[STATE.currentStep].receivedAnswer) {
+					if (isMultiple) {
+						const inputs = [...form.elements.answer];
+						const answers = STATE.answers[STATE.currentStep].receivedAnswer.split(',');
+						inputs.filter(input => answers.includes(input.id)).forEach(input => input.checked = true);
+						console.log(inputs)
+						console.log(answers)
+
+					} else {
+						form.elements.answer.value = STATE.answers[STATE.currentStep].receivedAnswer;
+					}
+				}
 				this.setRequired(form);
 				form.addEventListener('change', this.setRequired.bind(this, form))
 				form.addEventListener('submit', submitHandler);
+				const prevBtn = STATE.currentStep > 1 ? document.querySelector('button[type="button"]') : null;
+
+				if (prevBtn) {
+					prevBtn.addEventListener('click', takeStepBack)
+				}
 
 				function submitHandler(event) {
 					event.preventDefault();
@@ -108,6 +126,10 @@ class QuizStepCard {
 						STATE.answers[STATE.currentStep] = new Answer(STATE.questions[STATE.currentStep - 1], answer);
 						nextStep()
 					}
+				}
+
+				function takeStepBack() {
+					nextStep(false);
 				}
 			}
 			nextStep()
