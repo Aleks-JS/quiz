@@ -69,7 +69,6 @@ class QuizStepCard {
 		/** insert before button */
 		document.querySelector('button[type="submit"]').before(answers);
 		if (STATE.currentStep > 1) {
-			console.log(STATE.currentStep)
 			const prevStepBtn = document.createElement('button');
 			prevStepBtn.type = 'button';
 			prevStepBtn.classList.add('btn', 'btn-secondary', 'mt-3', 'me-3');
@@ -84,20 +83,16 @@ class QuizStepCard {
 				const {
 					STATE
 				} = this;
-				console.log(STATE)
 				STATE.currentStep = next ? STATE.currentStep += 1 : STATE.currentStep -= 1;
 				const q = STATE.questions[STATE.currentStep - 1];
 				const isMultiple = q.multiple_correct_answers === 'true';
 				await this.renderTemplate();
 				const form = document.querySelector('form');
-				console.log(form.elements.answer.value)
 				if (STATE.answers[STATE.currentStep] && STATE.answers[STATE.currentStep].receivedAnswer) {
 					if (isMultiple) {
 						const inputs = [...form.elements.answer];
 						const answers = STATE.answers[STATE.currentStep].receivedAnswer.split(',');
 						inputs.filter(input => answers.includes(input.id)).forEach(input => input.checked = true);
-						console.log(inputs)
-						console.log(answers)
 
 					} else {
 						form.elements.answer.value = STATE.answers[STATE.currentStep].receivedAnswer;
